@@ -28,6 +28,7 @@
     "metal"
   ],
   "dependencies": {
+    "metal": "^1.0.0",
     "metal-component": "^1.0.2",
     "metal-dom": "^1.0.0",
     "metal-incremental-dom": "^1.0.2",
