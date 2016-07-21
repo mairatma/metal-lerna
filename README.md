@@ -1,3 +1,3 @@
 # Metal.js
 
-This repo has moved to [metal/metal](https://github.com/metal/metal).
+This repo has moved to [metal/metal.js](https://github.com/metal/metal.js).
