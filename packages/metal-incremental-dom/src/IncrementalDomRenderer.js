@@ -66,6 +66,15 @@ class IncrementalDomRenderer extends ComponentRenderer.constructor {
 	}
 
 	/**
+	 * Get the component's incremental dom renderer data.
+	 * @param {!Component} component
+	 * @return {!Object}
+	 */
+	getData(component) {
+		return getData(component);
+	}
+
+	/**
 	 * Gets the component that triggered the current patch operation.
 	 * @return {Component}
 	 */
@@ -83,6 +92,14 @@ class IncrementalDomRenderer extends ComponentRenderer.constructor {
 	}
 
 	/**
+	 * Calls incremental dom's patch function to render the component.
+	 * @param {!Component} component
+	 */
+	patch(component) {
+		patch(component);
+	}
+
+	/**
 	 * Renders the renderer's component for the first time, patching its element
 	 * through incremental dom function calls. If the first arg is a function
 	 * instead of a component instance, creates and renders this function, which
@@ -97,7 +114,7 @@ class IncrementalDomRenderer extends ComponentRenderer.constructor {
 	 */
 	render(component, opt_dataOrElement, opt_parent) {
 		if (component instanceof Component) {
-			patch(component);
+			this.patch(component);
 		} else {
 			return renderFunction(this, component, opt_dataOrElement, opt_parent);
 		}
@@ -185,7 +202,7 @@ class IncrementalDomRenderer extends ComponentRenderer.constructor {
 	 */
 	update(component) {
 		if (this.shouldUpdate(component, getChanges(component))) {
-			patch(component);
+			this.patch(component);
 		}
 	}
 }

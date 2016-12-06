@@ -27,21 +27,23 @@ class JSXRenderer extends IncrementalDomRenderer.constructor {
 	 * incremental dom. Adds keys to elements that don't have one yet, according
 	 * to their position in the parent. This helps use cases that use
 	 * conditionally rendered elements, which is very common in JSX.
-	 * @protected
+	 * @param {!Component} component
+	 * @param {string} key
+	 * @return {?string}
 	 */
-	generateKey_(key) {
-		key = super.generateKey_(key);
-		const comp = IncrementalDomRenderer.getPatchingComponent();
-		const renderer = comp.getRenderer();
+	generateKey(component, key) {
+		key = super.generateKey(component, key);
+		const comp = this.getPatchingComponent();
+		const data = comp.getRenderer().getData(comp);
 		if (!isDefAndNotNull(key)) {
-			if (renderer.rootElementRendered_) {
+			if (data.rootElementRendered_) {
 				key = JSXRenderer.KEY_PREFIX + JSXRenderer.incElementCount();
 			} else if (comp.element && comp.element.__incrementalDOMData) {
 				key = comp.element.__incrementalDOMData.key;
 			}
 		}
-		if (!renderer.rootElementRendered_) {
-			renderer.rootElementRendered_ = true;
+		if (!data.rootElementRendered_) {
+			data.rootElementRendered_ = true;
 		}
 		return key;
 	}
@@ -77,24 +79,26 @@ class JSXRenderer extends IncrementalDomRenderer.constructor {
 	 * Overrides the original method from `IncrementalDomRenderer` so we can
 	 * keep track of if the root element of the patched component has already
 	 * been rendered or not.
+	 * @param {!Component} component
 	 * @override
 	 */
-	patch() {
-		this.rootElementRendered_ = false;
-		super.patch();
+	patch(component) {
+		this.getData(component).rootElementRendered_ = false;
+		super.patch(component);
 	}
 
 	/**
 	 * Overrides the original method from `IncrementalDomRenderer` to handle the
 	 * case where developers return a child node directly from the "render"
 	 * function.
+	 * @param {!Component} component
 	 * @override
 	 */
-	renderIncDom() {
-		if (this.component_.render) {
-			iDOMHelpers.renderArbitrary(this.component_.render());
+	renderIncDom(component) {
+		if (component.render) {
+			iDOMHelpers.renderArbitrary(component.render());
 		} else {
-			super.renderIncDom();
+			super.renderIncDom(component);
 		}
 	}
 
@@ -110,20 +114,22 @@ class JSXRenderer extends IncrementalDomRenderer.constructor {
 	 * Skips the current child in the count (used when a conditional render
 	 * decided not to render anything).
 	 */
-	static skipChild() {
+	skipChild() {
 		IncrementalDOM.elementVoid(JSXRenderer.incElementCount);
 	}
 
 	/**
 	 * @inheritDoc
 	 */
-	skipRender_() {
+	skipRender() {
 		JSXRenderer.skipChild();
-		super.skipRender_();
+		super.skipRender();
 	}
 }
 
 JSXRenderer.KEY_PREFIX = '_metal_jsx_';
-JSXRenderer.RENDERER_NAME = 'jsx';
 
-export default JSXRenderer;
+const jsxRenderer = new JSXRenderer();
+jsxRenderer.RENDERER_NAME = 'jsx';
+
+export default jsxRenderer;
